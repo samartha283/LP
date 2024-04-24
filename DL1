@@ -1,0 +1,56 @@
+import numpy as np    #NumPy is a Python library used for working with arrays.
+import pandas as pd   # Pandas is a Python library used for working with data sets.
+import matplotlib.pyplot as plt   #Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python
+import seaborn as sns   #Seaborn is a library for making statistical graphics in Python
+from sklearn.model_selection import train_test_split  #  sklearn : tools for machine learning and statistical modeling including classification, regression, clustering and dimensionality reduction.
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import r2_score, mean_squared_error
+import keras  :keras : Keras is a high-level, deep learning API developed by Google for implementing neural networks. It is written in Python and is used to make the implementation of neural networks easy
+import io
+from keras.layers import Dense   #dense:the layer that contains all the neurons that are deeply connected within themselves.
+from keras.models import Sequential
+import warnings
+warnings.filterwarnings("ignore")
+
+
+
+data = pd.read_csv('boston.csv')
+print(data.head())
+
+print(data.shape)
+print(data.dtypes)
+print(data.isnull().sum())
+print(data.describe())
+
+
+sns.displot(data.MEDV)  #  creates a distribution plot (histogram) of the 'MEDV' variable from the DataFrame data using Seaborn's displot function.
+correlation = data.corr()  #This line calculates the correlation matrix of the DataFrame data using the .corr() method. 
+correlation.loc['MEDV']
+fig,axes = plt.subplots(figsize=(15,12))
+sns.heatmap(correlation,square = True,annot = True)
+
+
+# Splitting Data into testing and training data
+X = data.iloc[:,:-1]
+y= data.MEDV
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2, random_state = 4)
+
+# Normalizing the data 
+sc = StandardScaler()   # StandardScaler is a preprocessing technique used to standardize features by removing the mean and scaling to unit variance. This makes sure that each feature has a mean of 0 and a standard deviation of 1.
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+
+# Model Building
+model = Sequential()
+model.add(Dense(128,activation  = 'relu',input_dim =13))
+model.add(Dense(64,activation  = 'relu'))   #relu : The function returns 0 if it receives any negative input, but for any positive value x it returns that value back
+model.add(Dense(32,activation  = 'relu'))
+model.add(Dense(16,activation  = 'relu'))
+model.add(Dense(1))
+model.compile(optimizer = 'adam',loss = 'mean_squared_error')
+model.summary()
+
+
+# epochs:  the number of times the entire training dataset will be passed forward and backward through the neural network during training.
+model.fit(X_train, y_train, epochs = 100)
