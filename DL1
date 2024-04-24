@@ -54,3 +54,11 @@ model.summary()
 
 # epochs:  the number of times the entire training dataset will be passed forward and backward through the neural network during training.
 model.fit(X_train, y_train, epochs = 100)
+
+
+# Evaluating  the model
+y_pred = model.predict(X_test)
+r2 = r2_score(y_test, y_pred)
+rmse = (np.sqrt(mean_squared_error(y_test, y_pred)))
+print("R2 Score = ", r2)
+print("RMSE Score = ", rmse)
