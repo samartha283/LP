@@ -1,0 +1,95 @@
+for running in terminal:
+pwd
+cd Desktop/
+touch in.cpp
+g++ -o in in.cpp
+./in
+
+
+#include <iostream>
+#include <omp.h>
+
+void bubble(int *, int);
+void swap(int &, int &);
+
+void bubble(int *a, int n) {
+    bool swapped;
+    for (int i = 0; i < n - 1; i++) {
+        swapped = false;
+#pragma omp parallel for shared(a, n, swapped)
+        for (int j = 0; j < n - i - 1; j++) {
+            if (a[j] > a[j + 1]) {
+#pragma omp critical
+                {
+                    swap(a[j], a[j + 1]);
+                    swapped = true;
+                }
+            }
+        }
+        if (!swapped)
+            break; // Array is already sorted
+    }
+}
+
+void swap(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int main() {
+    int *a, n;
+    std::cout << "Enter total number of elements: ";
+    std::cin >> n;
+    a = new int[n];
+    std::cout << "Enter elements: ";
+    for (int i = 0; i < n; i++) {
+        std::cin >> a[i];
+    }
+    bubble(a, n);
+    std::cout << "Sorted array: ";
+    for (int i = 0; i < n; i++) {
+        std::cout << a[i] << " ";
+    }
+    std::cout << std::endl;
+    delete[] a; // Deallocate memory
+    return 0;
+}
+
+output:
+Enter total number of elements: 9
+Enter elements: 1 2 3 4 5 69 8 5 6
+Sorted array: 1 2 3 4 5 5 6 8 69 
+
+
+
+output input:
+enter total number of elements : 10
+enter elements : 11 10 2 5 4 3 8 9 7 1
+
+
+
+OpenMP (Open Multi-Processing) is an API (Application Programming Interface) that supports multi-platform shared memory multiprocessing programming in C, C++
+
+
+
+What is Bubble Sort?
+Answer: Bubble Sort is a simple sorting algorithm that repeatedly steps through the list to be sorted, compares adjacent elements, and swaps them if they are in the wrong order. The pass through the list is repeated until the list is sorted.
+How does Bubble Sort work?
+Answer: Bubble Sort works by repeatedly stepping through the list, comparing adjacent elements, and swapping them if they are in the wrong order. This process is repeated until the entire list is sorted.
+What is the time complexity of Bubble Sort?
+Answer: The time complexity of Bubble Sort is O(n^2), where n is the number of elements in the list. This is because Bubble Sort compares all pairs of adjacent elements and performs swaps as necessary, leading to quadratic time complexity.
+What is the space complexity of Bubble Sort?
+Answer: The space complexity of Bubble Sort is O(1), indicating that the algorithm requires a constant amount of additional space for storing temporary variables and performing swaps.
+Is Bubble Sort stable or unstable?
+Answer: Bubble Sort is a stable sorting algorithm, meaning that it preserves the relative order of equal elements. If two elements have the same value, their relative order in the input list will be maintained in the sorted list.
+Can Bubble Sort be optimized?
+Answer: Yes, Bubble Sort can be optimized by introducing a flag variable to indicate whether any swaps were performed during a pass through the list. If no swaps are made during a pass, the list is already sorted, and the algorithm can terminate early.
+What is the best-case time complexity of Bubble Sort?
+Answer: The best-case time complexity of Bubble Sort is O(n), which occurs when the input list is already sorted. In this case, Bubble Sort performs a single pass through the list without any swaps.
+What is the worst-case time complexity of Bubble Sort?
+Answer: The worst-case time complexity of Bubble Sort is O(n^2), which occurs when the input list is sorted in reverse order. In this case, Bubble Sort performs the maximum number of comparisons and swaps.
+What are the advantages and disadvantages of Bubble Sort?
+Answer:
+Advantages: Bubble Sort is simple to understand and implement, requires minimal additional space (O(1)), and can be useful for sorting small lists or nearly sorted lists.
+Disadvantages: Bubble Sort has poor time complexity (O(n^2)) compared to more efficient sorting algorithms, such as Quick Sort or Merge Sort, making it impractical for sorting large lists.
