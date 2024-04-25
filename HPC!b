@@ -1,0 +1,105 @@
+for running in terminal:
+pwd
+cd Desktop/
+touch in.cpp
+g++ -o in in.cpp
+./in
+
+
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <omp.h> // Include OpenMP header
+using namespace std;
+
+const int MAX = 100000;
+vector<int> graph[MAX];
+bool visited[MAX];
+
+void dfs(int node) {
+    stack<int> s;
+    s.push(node);
+    while (!s.empty()) {
+        int curr_node = s.top();
+        s.pop();
+        if (!visited[curr_node]) {
+            visited[curr_node] = true;
+            #pragma omp parallel for // Parallelize this loop
+            for (int i = 0; i < graph[curr_node].size(); i++) {
+                int adj_node = graph[curr_node][i];
+                if (!visited[adj_node]) {
+                    s.push(adj_node);
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    int n, m, start_node;
+    cin >> n >> m >> start_node;
+
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
+
+    for (int i = 0; i < n; i++) {
+        visited[i] = false;
+    }
+
+    dfs(start_node);
+
+    #pragma omp parallel for // Parallelize this loop
+    for (int i = 0; i < n; i++) {
+        if (visited[i]) {
+            #pragma omp critical // Make sure cout is accessed by only one thread at a time
+            cout << i << " ";
+        }
+    }
+    return 0;
+}
+
+
+
+output input:
+6 7 0
+0 1
+0 2
+1 3
+2 4
+2 5
+4 5
+4 5
+
+0 1 2 4 5 3
+
+
+
+
+
+OpenMP (Open Multi-Processing) is an API (Application Programming Interface) that supports multi-platform shared memory multiprocessing programming in C, C++, 
+
+
+What is DFS?
+Answer: DFS stands for Depth-First Search. It is a graph traversal algorithm that explores as far as possible along each branch before backtracking.
+How does DFS work?
+Answer: DFS starts at a selected node (often called the root or source node) and explores as far as possible along each branch before backtracking. It uses a stack data structure (or recursion) to keep track of the nodes to be visited next.
+What is the difference between BFS and DFS?
+Answer: BFS (Breadth-First Search) explores all the neighbor nodes at the present depth level before moving on to the nodes at the next depth level, whereas DFS explores as far as possible along each branch before backtracking. BFS uses a queue data structure, while DFS uses a stack (or recursion).
+What is the time complexity of DFS?
+Answer: The time complexity of DFS is O(V + E), where V is the number of vertices (nodes) in the graph and E is the number of edges. This is because DFS visits each vertex and edge of the graph exactly once.
+What is the space complexity of DFS?
+Answer: The space complexity of DFS depends on whether recursion or an explicit stack is used. If recursion is used, the space complexity is O(V) due to the recursion stack. If an explicit stack is used, the space complexity is O(V) as well.
+What is backtracking in DFS?
+Answer: Backtracking in DFS refers to the process of returning to the previous decision point (node) in the search tree when all possible options have been explored from the current node. It allows DFS to explore other branches of the tree.
+What is the application of DFS?
+Answer: DFS has various applications, including finding connected components in a graph, detecting cycles in a graph, topological sorting, solving puzzles and games (e.g., maze-solving), and more.
+Can DFS be used to find the shortest path in a graph?
+Answer: DFS can find a path between two nodes in a graph, but it does not guarantee the shortest path. For finding the shortest path, algorithms such as Dijkstra's algorithm or the Bellman-Ford algorithm are typically used.
+What is the difference between pre-order, in-order, and post-order traversal in DFS?
+Answer: Pre-order, in-order, and post-order are different traversal orders used in DFS for binary trees. Pre-order traversal visits the current node before its children, in-order traversal visits the left child, then the current node, then the right child, and post-order traversal visits the children before the current node.
+How does DFS handle cycles in a graph?
+Answer: DFS can detect cycles in a graph by keeping track of visited nodes and back edges. If DFS encounters a back edge (an edge from a node to an already visited ancestor in the DFS traversal tree), it indicates the presence of a cycle in the graph.
