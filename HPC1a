@@ -1,0 +1,148 @@
+for running in terminal:
+pwd
+cd Desktop/
+touch in.cpp
+g++ -o in in.cpp
+./in
+
+
+#include <iostream>
+#include <queue>
+#include <omp.h> // Include OpenMP header
+using namespace std;
+
+class node {
+public:
+    node *left, *right;
+    int data;
+};
+
+node *insert(node *root, int data) {
+    if (!root) {
+        root = new node;
+        root->left = NULL;
+        root->right = NULL;
+        root->data = data;
+        return root;
+    }
+
+    queue<node *> q;
+    q.push(root);
+    #pragma omp parallel
+    {
+        while (!q.empty()) {
+            #pragma omp single nowait
+            {
+                node *temp = q.front();
+                q.pop();
+                if (temp->left == NULL) {
+                    #pragma omp critical
+                    {
+                        temp->left = new node;
+                        temp->left->left = NULL;
+                        temp->left->right = NULL;
+                        temp->left->data = data;
+                    }
+                    return root; // Insertion done, return the root of the tree
+                } else {
+                    q.push(temp->left); // Push left child to the queue
+                }
+                if (temp->right == NULL) {
+                    #pragma omp critical
+                    {
+                        temp->right = new node;
+                        temp->right->left = NULL;
+                        temp->right->right = NULL;
+                        temp->right->data = data;
+                    }
+                    return root; // Insertion done, return the root of the tree
+                } else {
+                    q.push(temp->right); // Push right child to the queue
+                }
+            }
+        }
+    }
+    return root; // Return root if no insertion happened
+}
+
+void bfs(node *head) {
+    if (!head)
+        return;
+    queue<node *> q;
+    q.push(head);
+    while (!q.empty()) {
+        node *currNode = q.front();
+        q.pop();
+        cout << "\t" << currNode->data;
+        if (currNode->left)
+            q.push(currNode->left);
+        if (currNode->right)
+            q.push(currNode->right);
+    }
+}
+
+int main() {
+    node *root = NULL;
+    int data;
+    char ans;
+    do {
+        cout << "\nEnter the data => ";
+        cin >> data;
+        root = insert(root, data);
+        cout << "Do you want to insert one or more nodes? (y/n) ";
+        cin >> ans;
+    } while (ans == 'y' || ans == 'Y');
+
+    cout << "BFS Traversal:" << endl;
+    bfs(root);
+    return 0;
+}
+
+
+
+output:
+Enter the data => 4
+Do you want to insert one or more nodes? (y/n) y
+
+Enter the data => 10
+Do you want to insert one or more nodes? (y/n) y
+
+Enter the data => 7
+Do you want to insert one or more nodes? (y/n) y
+
+Enter the data => 12
+Do you want to insert one or more nodes? (y/n) y
+
+Enter the data => 15
+Do you want to insert one or more nodes? (y/n) n
+BFS Traversal:
+	4	10	7	12	15
+
+
+
+
+
+
+
+
+
+
+OpenMP (Open Multi-Processing) is an API (Application Programming Interface) that supports multi-platform shared memory multiprocessing programming in C, C++
+
+
+What is BFS?
+Answer: BFS stands for Breadth-First Search. It is a graph traversal algorithm that explores all the neighbor nodes at the present depth before moving on to the nodes at the next depth level.
+How does BFS work?
+Answer: BFS starts at a selected node (often called the root or source node) and explores all of its neighbors at the present depth level before moving on to the neighbors at the next depth level. It uses a queue data structure to keep track of the nodes to be visited next.
+What is the difference between DFS and BFS?
+Answer: DFS (Depth-First Search) explores as far as possible along each branch before backtracking, whereas BFS explores all the neighbor nodes at the present depth level before moving on to the nodes at the next depth level. DFS uses a stack data structure, while BFS uses a queue.
+What is the time complexity of BFS?
+Answer: The time complexity of BFS is O(V + E), where V is the number of vertices (nodes) in the graph and E is the number of edges. This is because BFS visits each vertex and edge of the graph exactly once.
+What is the space complexity of BFS?
+Answer: The space complexity of BFS is O(V), where V is the number of vertices (nodes) in the graph. This is because BFS needs to maintain a queue to store the nodes to be visited, and the size of the queue can grow up to the number of vertices in the graph.
+What is the application of BFS?
+Answer: BFS has various applications, including finding the shortest path in an unweighted graph, discovering connected components in a graph, testing bipartiteness of a graph, solving puzzles and games (e.g., maze-solving), and more.
+Can BFS be used to find the shortest path in a weighted graph?
+Answer: BFS can find the shortest path in an unweighted graph, where each edge has the same weight. However, for weighted graphs, where edges have different weights, algorithms such as Dijkstra's algorithm or the Bellman-Ford algorithm are typically used.
+How does BFS ensure that each node is visited only once?
+Answer: BFS maintains a set of visited nodes to ensure that each node is visited only once. Before enqueuing a node into the queue, BFS checks whether it has been visited already. If it has, the node is not enqueued again. This prevents nodes from being visited more than once.
