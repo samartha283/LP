@@ -1,0 +1,123 @@
+for running in terminal:
+pwd
+cd Desktop/
+touch in.cpp
+g++ -o in in.cpp -fopenmp
+./in
+
+
+#include<stdio.h>
+#include<omp.h>
+
+void merge(int array[], int low, int mid, int high) {
+    int temp[30];
+    int i = low, j = mid + 1, k = low;
+
+    while (i <= mid && j <= high) {
+        if (array[i] <= array[j]) {
+            temp[k++] = array[i++];
+        } else {
+            temp[k++] = array[j++];
+        }
+    }
+
+    while (i <= mid) {
+        temp[k++] = array[i++];
+    }
+
+    while (j <= high) {
+        temp[k++] = array[j++];
+    }
+
+    for (i = low; i <= high; i++) {
+        array[i] = temp[i];
+    }
+}
+
+void mergesort(int array[], int low, int high) {
+    int mid;
+
+    if (low < high) {
+        mid = (low + high) / 2;
+        #pragma omp parallel sections num_threads(2)
+        {
+            #pragma omp section
+            {
+                mergesort(array, low, mid);
+            }
+            #pragma omp section
+            {
+                mergesort(array, mid + 1, high);
+            }
+        }
+        merge(array, low, mid, high);
+    }
+}
+
+int main() {
+    int array[50];
+    int i, size;
+    printf("Enter total no. of elements:\n");
+    scanf("%d", &size);
+    printf("Enter %d elements:\n", size);
+    for (i = 0; i < size; i++) {
+        scanf("%d", &array[i]);
+    }
+    mergesort(array, 0, size - 1);
+    printf("Sorted Elements as follows:\n");
+    for (i = 0; i < size; i++) {
+        printf("%d ", array[i]);
+    }
+    printf("\n");
+    return 0;
+}
+
+output:
+Enter total no. of elements:
+5
+Enter 5 elements:
+5
+6
+4
+3
+8
+Sorted Elements as follows:
+3 4 5 6 8 
+
+
+
+output input:
+enter total number of elements : 9
+enter 9 elements : 1 7 8 9 5 6 4 6 2
+
+
+
+
+OpenMP (Open Multi-Processing) is an API (Application Programming Interface) that supports multi-platform shared memory multiprocessing programming in C, C++
+
+
+What is Merge Sort?
+Answer: Merge Sort is a popular sorting algorithm that follows the divide-and-conquer approach. It divides the array into two halves, recursively sorts each half, and then merges the sorted halves to produce a single sorted array.
+How does Merge Sort work?
+Answer: Merge Sort works by recursively dividing the array into two halves until each half contains only one element (sorted by definition). It then merges the sorted halves back together by comparing elements from each half and placing them in the correct order.
+What is the time complexity of Merge Sort?
+Answer: The time complexity of Merge Sort is O(n log n), where n is the number of elements in the array. This is because Merge Sort divides the array into halves recursively and then merges the sorted halves, resulting in a logarithmic number of recursive calls and linear time complexity for merging.
+What is the space complexity of Merge Sort?
+Answer: The space complexity of Merge Sort is O(n), where n is the number of elements in the array. This is because Merge Sort requires additional space for storing the temporary merged array during the merging phase.
+Is Merge Sort stable or unstable?
+Answer: Merge Sort is a stable sorting algorithm, meaning that it preserves the relative order of equal elements. If two elements have the same value, their relative order in the input list will be maintained in the sorted list.
+Can Merge Sort be implemented iteratively?
+Answer: While Merge Sort is typically implemented recursively, it can be implemented iteratively using a bottom-up approach. Instead of dividing the array recursively, this approach starts by merging adjacent pairs of elements and gradually increases the size of the merged subarrays until the entire array is sorted.
+What are the advantages of Merge Sort?
+Answer: Merge Sort has several advantages, including:
+It has a consistent time complexity of O(n log n) for all cases.
+It is a stable sorting algorithm.
+It performs well on large datasets and is efficient for sorting linked lists.
+What are the limitations of Merge Sort?
+Answer: Merge Sort has some limitations, including:
+It requires additional space for merging, which can be a concern for memory-constrained environments.
+It may not be as efficient as other sorting algorithms, such as Quick Sort, for small datasets or nearly sorted arrays.
+Can Merge Sort be parallelized?
+Answer: Yes, Merge Sort can be parallelized using techniques like OpenMP or parallel processing frameworks. By dividing the sorting process into parallel tasks, Merge Sort can take advantage of multi-core processors and improve performance.
+What is the role of the merge function in Merge Sort?
+Answer: The merge function in Merge Sort combines two sorted subarrays into a single sorted array. It compares elements from each subarray and merges them in sorted order, resulting in a sorted array.
